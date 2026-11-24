@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   Cpu,
   Sparkles,
+  WifiOff,
+  Wifi,
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
@@ -23,6 +25,7 @@ import { useApp } from '../contexts/AppContext';
 import { useVoice } from '../contexts/VoiceContext';
 import { useSettings } from '../contexts/SettingsContext';
 import { historyService } from '../services/historyService';
+import { recognitionService } from '../services/recognitionService';
 import type { HistoryRecord, Denomination } from '../types';
 
 const SAMPLE_DENOMINATIONS: { value: Denomination; label: string; color: string }[] = [
@@ -40,12 +43,16 @@ export default function Home() {
   const { speak } = useVoice();
   const { settings } = useSettings();
   const [recentScans, setRecentScans] = useState<HistoryRecord[]>([]);
+  const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Load recent scans
     const history = historyService.getHistory();
     setRecentScans(history.slice(0, 3));
     speak('Welcome to Drishti AI. Your currency recognition assistant is ready. Tap Scan Currency to begin scanning banknotes.');
+
+    // Probe backend reachability (non-blocking)
+    recognitionService.isBackendReachable().then(setBackendOnline).catch(() => setBackendOnline(false));
   }, []);
 
   const handleStartDemoScan = (denom: Denomination) => {
@@ -164,16 +171,34 @@ export default function Home() {
               </span>
             </div>
           ) : (
-            <div className="flex items-start gap-2 pt-1 text-xs">
-              {isModelAvailable ? (
+            <div className="flex flex-col gap-1.5 pt-1 text-xs">
+              {/* Backend connectivity badge */}
+              {backendOnline === null ? (
+                <div className="flex items-center gap-1.5 text-gray-400">
+                  <Wifi className="w-4 h-4 flex-shrink-0 animate-pulse" />
+                  <span>Checking AI backend…</span>
+                </div>
+              ) : backendOnline ? (
                 <div className="flex items-center gap-1.5 text-teal-300">
                   <CheckCircle2 className="w-4 h-4 text-teal-400 flex-shrink-0" />
                   <span>AI Inference Backend Connected (FastAPI + CNN Service)</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 text-amber-300">
-                  <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>AI Model service not connected. Demo Mode is available.</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 text-amber-300">
+                    <WifiOff className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span><strong>Offline Mode:</strong> Backend not reachable.</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-cyan-300 pl-5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                    <span>On-device recognition active — no internet needed.</span>
+                  </div>
+                </div>
+              )}
+              {!isModelAvailable && backendOnline !== true && (
+                <div className="flex items-center gap-1.5 text-gray-400 pl-1">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Switch to Demo Mode to test without backend.</span>
                 </div>
               )}
             </div>

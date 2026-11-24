@@ -10,6 +10,8 @@ import {
   Sparkles,
   Info,
   ShieldCheck,
+  WifiOff,
+  Cpu,
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
@@ -109,6 +111,22 @@ export default function Result() {
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 DEMO MODE
               </span>
+            ) : result.engineUsed === 'on-device' ? (
+              <span
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30"
+                aria-label="Recognized using on-device classifier (offline)"
+              >
+                <WifiOff className="w-3.5 h-3.5" aria-hidden="true" />
+                On-device
+              </span>
+            ) : result.engineUsed === 'ai-backend' ? (
+              <span
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                aria-label="Recognized using AI backend"
+              >
+                <Cpu className="w-3.5 h-3.5" aria-hidden="true" />
+                AI Backend
+              </span>
             ) : (
               result.confidence !== undefined && (
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
@@ -134,6 +152,13 @@ export default function Result() {
             <p className="text-xs sm:text-sm text-gray-300 font-medium mt-1">
               {meta.details}
             </p>
+
+            {/* Confidence line (only when available and not demo) */}
+            {!result.isDemo && result.confidence !== undefined && (
+              <p className="text-xs text-gray-400 mt-1">
+                Confidence: {Math.round(result.confidence * 100)}%
+              </p>
+            )}
           </div>
 
           {/* Optional Image Thumbnail */}

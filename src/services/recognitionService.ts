@@ -1,4 +1,4 @@
-import type { RecognitionResult, ModelStatus, Denomination } from '../types/index';
+import type { RecognitionResult, ModelStatus, Denomination, EngineUsed } from '../types/index';
 import { classifyImageClientSide } from './imageClassifier';
 
 // In a Capacitor Android APK, window.location is a file:// URL.
@@ -32,9 +32,38 @@ function normalizeDenomination(val: string): Denomination {
 
 class RecognitionService {
   private baseUrl: string;
+  /** Cached result of last backend probe. null = unknown. */
+  private _backendOnline: boolean | null = null;
+  private _lastProbeMs = 0;
+  /** Re-probe at most once per 10 seconds */
+  private readonly PROBE_TTL_MS = 10_000;
 
   constructor(baseUrl: string = API_BASE_URL) {
     this.baseUrl = baseUrl;
+  }
+
+  /** Quick health probe: is the Node backend reachable? */
+  async isBackendReachable(): Promise<boolean> {
+    const now = Date.now();
+    if (this._backendOnline !== null && now - this._lastProbeMs < this.PROBE_TTL_MS) {
+      return this._backendOnline;
+    }
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 3000);
+      const r = await fetch(`${this.baseUrl}/api/health`, { signal: ctrl.signal });
+      clearTimeout(tid);
+      this._backendOnline = r.ok;
+    } catch {
+      this._backendOnline = false;
+    }
+    this._lastProbeMs = Date.now();
+    return this._backendOnline;
+  }
+
+  /** Invalidate the cached probe result (call after a failed prediction) */
+  private invalidateProbe() {
+    this._backendOnline = null;
   }
 
   // ─── Demo Mode ───────────────────────────────────────────────
@@ -57,6 +86,7 @@ class RecognitionService {
         denomination: clientResult.denomination,
         confidence: clientResult.confidence,
         isDemo: true,
+        engineUsed: 'demo',
         timestamp: Date.now(),
       };
     }
@@ -69,6 +99,7 @@ class RecognitionService {
       id: `demo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       denomination: normalized,
       isDemo: true,
+      engineUsed: 'demo',
       timestamp: Date.now(),
     };
   }
@@ -76,6 +107,15 @@ class RecognitionService {
   // ─── Real AI Mode ────────────────────────────────────────────
 
   async recognizeImage(imageFile: File | Blob): Promise<RecognitionResult> {
+    // ── Step 1: Check backend reachability before attempting network call ──
+    const backendAvailable = await this.isBackendReachable();
+
+    if (!backendAvailable) {
+      // ── Offline / No backend: skip network, run on-device classifier directly ──
+      return this._runOnDevice(imageFile, 'offline');
+    }
+
+    // ── Step 2: Try backend inference ──
     const formData = new FormData();
     formData.append('image', imageFile, 'capture.jpg');
 
@@ -86,8 +126,9 @@ class RecognitionService {
         body: formData,
       });
     } catch {
-      // Backend is unreachable -> use client-side visual classifier as seamless fallback
-      response = null;
+      // Network failed mid-request — invalidate probe and use on-device fallback
+      this.invalidateProbe();
+      return this._runOnDevice(imageFile, 'network-error');
     }
 
     if (response && response.ok) {
@@ -125,11 +166,21 @@ class RecognitionService {
         denomination: normalizeDenomination(rawDenomination),
         confidence,
         isDemo: false,
+        engineUsed: 'ai-backend',
         timestamp: Date.now(),
       };
     }
 
-    // Seamless Fallback: Run local client-side computer vision classifier
+    // Backend responded but with an error status — fall back to on-device
+    this.invalidateProbe();
+    return this._runOnDevice(imageFile, 'backend-error');
+  }
+
+  /** Run on-device (client-side) HSV classifier and return a stamped result */
+  private async _runOnDevice(
+    imageFile: File | Blob,
+    _reason: string,
+  ): Promise<RecognitionResult> {
     const fallback = await classifyImageClientSide(imageFile);
 
     if (fallback.isUncertain || fallback.denomination === 'uncertain') {
@@ -140,10 +191,11 @@ class RecognitionService {
     }
 
     return {
-      id: `ai_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      id: `od_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       denomination: fallback.denomination,
       confidence: fallback.confidence,
       isDemo: false,
+      engineUsed: 'on-device',
       timestamp: Date.now(),
     };
   }

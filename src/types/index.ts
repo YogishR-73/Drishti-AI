@@ -26,6 +26,9 @@ export const DENOMINATION_VALUES: Record<Denomination, number> = {
   '₹500': 500,
 };
 
+/** Which inference engine produced this result */
+export type EngineUsed = 'ai-backend' | 'on-device' | 'demo';
+
 /** Result of a currency recognition attempt */
 export interface RecognitionResult {
   id: string;
@@ -34,6 +37,8 @@ export interface RecognitionResult {
   timestamp: number;
   imageUrl?: string;
   isDemo: boolean;
+  /** Which engine produced this result */
+  engineUsed?: EngineUsed;
 }
 
 /** Recognition mode: demo uses sample images, real uses camera/upload */
