@@ -442,6 +442,16 @@ export default function Scan() {
                 <Volume2 className="w-4 h-4" aria-hidden="true" />
                 <span>Hear Positioning Instructions</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/upload')}
+                className="text-xs text-gray-400 hover:text-cyan-300 py-2 min-h-[44px] flex items-center gap-1.5 transition-colors"
+                aria-label="Upload a saved photo of a banknote instead of using camera"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 rotate-180" aria-hidden="true" />
+                <span>Upload saved photo instead</span>
+              </button>
             </div>
           )
         )}

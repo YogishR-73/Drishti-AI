@@ -93,16 +93,27 @@
   }
 }
 
+/* ----- Reduced motion support ----- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ----- Custom keyframe animations ----- */
 
 /* Soft glowing pulse (used on scan button) */
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 8px 2px rgba(34, 211, 238, 0.35);
   }
   50% {
-    box-shadow: 0 0 24px 8px rgba(59, 130, 246, 0.7);
+    box-shadow: 0 0 24px 8px rgba(34, 211, 238, 0.65);
   }
 }
 .animate-pulse-glow {

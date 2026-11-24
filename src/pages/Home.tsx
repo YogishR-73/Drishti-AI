@@ -39,7 +39,7 @@ const SAMPLE_DENOMINATIONS: { value: Denomination; label: string; color: string 
 
 export default function Home() {
   const navigate = useNavigate();
-  const { recognitionMode, setRecognitionMode, isModelAvailable } = useApp();
+  const { recognitionMode, setRecognitionMode } = useApp();
   const { speak } = useVoice();
   const { settings } = useSettings();
   const [recentScans, setRecentScans] = useState<HistoryRecord[]>([]);
@@ -195,7 +195,7 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              {!isModelAvailable && backendOnline !== true && (
+              {backendOnline === false && (
                 <div className="flex items-center gap-1.5 text-gray-400 pl-1">
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>Switch to Demo Mode to test without backend.</span>

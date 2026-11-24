@@ -322,7 +322,7 @@ export default function Settings() {
               <div>
                 <div className="text-sm font-bold text-white">Current Mode</div>
                 <div className="text-xs text-gray-400">
-                  {recognitionMode === 'demo' ? 'Sample demonstration notes' : 'Live neural inference'}
+                  {recognitionMode === 'demo' ? 'Sample demonstration notes' : 'Live camera or uploaded image'}
                 </div>
               </div>
               <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
@@ -344,8 +344,8 @@ export default function Settings() {
             </div>
 
             <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-300 font-semibold">Neural Architecture</span>
-              <span className="text-gray-400">FastAPI Chromatic Vision Engine (6 Classes)</span>
+              <span className="text-gray-300 font-semibold">Recognition Engine</span>
+              <span className="text-gray-400">OpenCV HSV Classifier • 6 Denominations</span>
             </div>
 
             <div className="flex items-center justify-between text-xs">

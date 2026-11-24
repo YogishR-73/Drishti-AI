@@ -114,6 +114,16 @@ export default function History() {
                           DEMO
                         </span>
                       )}
+                      {!record.isDemo && record.engineUsed === 'on-device' && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                          ON-DEVICE
+                        </span>
+                      )}
+                      {!record.isDemo && record.engineUsed === 'ai-backend' && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                          AI
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1">

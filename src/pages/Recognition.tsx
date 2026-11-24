@@ -51,7 +51,7 @@ export default function Recognition() {
           handleSuccess(result);
         } else if (capturedImage) {
           // User captured from Camera or uploaded an actual Banknote Image
-          setStatusText('Extracting currency chromatic profile, color patterns, and features…');
+          setStatusText('Analyzing banknote colors and patterns…');
           speak('Extracting banknote features and identifying denomination.');
 
           let result: RecognitionResult;
@@ -148,7 +148,7 @@ export default function Recognition() {
 
               <div>
                 <h2 className="text-xl font-extrabold text-white mb-2 tracking-wide">
-                  Drishti AI Neural Engine
+                  Drishti AI Recognition
                 </h2>
                 <p className="text-sm font-semibold text-cyan-300 max-w-xs mx-auto leading-relaxed">
                   {statusText}

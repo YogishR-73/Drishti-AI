@@ -54,6 +54,30 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     setSettings(loadSettings());
   }, []);
 
+  // Sync accessibility CSS classes to <html> whenever relevant settings change
+  useEffect(() => {
+    const html = document.documentElement;
+    html.classList.toggle('high-contrast', settings.highContrast);
+    html.classList.toggle('large-text', settings.largeText);
+    html.style.setProperty('--font-scale', String(settings.fontSize));
+  }, [settings.highContrast, settings.largeText, settings.fontSize]);
+
+  // Sync accessibility CSS classes to <html> element whenever relevant settings change
+  useEffect(() => {
+    const html = document.documentElement;
+    if (settings.highContrast) {
+      html.classList.add('high-contrast');
+    } else {
+      html.classList.remove('high-contrast');
+    }
+    if (settings.largeText) {
+      html.classList.add('large-text');
+    } else {
+      html.classList.remove('large-text');
+    }
+    html.style.setProperty('--font-scale', String(settings.fontSize));
+  }, [settings.highContrast, settings.largeText, settings.fontSize]);
+
   const updateSettings = useCallback((partial: Partial<AppSettings>) => {
     setSettings((prev) => {
       const next = { ...prev, ...partial };
