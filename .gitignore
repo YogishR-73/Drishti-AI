@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+*.log
+*.local
+tsconfig.tsbuildinfo
+ai_service/__pycache__/
+ai_service/*.jpg
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+.DS_Store
