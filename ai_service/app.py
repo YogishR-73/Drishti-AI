@@ -174,7 +174,8 @@ def classify_banknote(img_bgr: np.ndarray) -> dict:
 
     # Calibrate confidence score
     confidence = min(0.98, max(0.35, best_score * 2.2))
-    is_uncertain = best_score < 0.12 or confidence < CONFIDENCE_THRESHOLD
+    # Real photos have mixed backgrounds — use 0.06 not 0.12 as uncertain cutoff
+    is_uncertain = best_score < 0.06 or confidence < CONFIDENCE_THRESHOLD
 
     return {
         'denomination': 'uncertain' if is_uncertain else best_denom,

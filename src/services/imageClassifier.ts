@@ -161,7 +161,9 @@ export async function classifyImageClientSide(imageSource: Blob | string): Promi
       const matchRatio = bestScore / totalPixels;
       const confidence = Math.min(0.98, Math.max(0.40, matchRatio * 2.3));
 
-      if (matchRatio < 0.10 || confidence < 0.50) {
+      // Real photos have mixed colors — lower the minimum match ratio to 0.05
+      // so genuine currency notes aren't rejected due to background/noise pixels
+      if (matchRatio < 0.05 || confidence < 0.42) {
         resolve({ denomination: 'uncertain', confidence: Math.round(confidence * 100) / 100, isUncertain: true });
         return;
       }

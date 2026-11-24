@@ -1,7 +1,16 @@
 import type { RecognitionResult, ModelStatus, Denomination } from '../types/index';
 import { classifyImageClientSide } from './imageClassifier';
 
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '';
+// In a Capacitor Android APK, window.location is a file:// URL.
+// We must use the explicit backend URL set at build time, or
+// fall back to localhost:3001 for development.
+// On the installed APK, the phone must be on the same WiFi as
+// the PC running the backend for real AI mode to work.
+const API_BASE_URL: string =
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== 'undefined' && window.location.origin.startsWith('http')
+    ? window.location.origin
+    : 'http://localhost:3001');
 
 export class RecognitionError extends Error {
   public readonly code: string;

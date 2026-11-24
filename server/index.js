@@ -216,7 +216,15 @@ app.use((err, _req, res, _next) => {
 // ---------------------------------------------------------------------------
 // Start server
 // ---------------------------------------------------------------------------
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀  Drishti AI backend listening on http://localhost:${PORT}`);
   console.log(`🤖  Python model service URL: ${PYTHON_MODEL_SERVICE_URL}`);
+});
+
+// Keep server alive — catch unhandled rejections so multer parse errors don't crash the process
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception (server kept alive):', err.message);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection (server kept alive):', reason);
 });
