@@ -174,6 +174,52 @@ export default function Settings() {
 
             <hr className="border-white/10" />
 
+            {/* Text Size Selector */}
+            <div className="space-y-2 py-1">
+              <div className="flex justify-between items-center text-sm font-semibold">
+                <span className="text-white flex items-center gap-2">
+                  <Type className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+                  Text Size
+                </span>
+                <span className="text-cyan-400 font-bold">
+                  {settings.fontSize === 0.85 ? 'Small' : settings.fontSize === 1.0 ? 'Normal' : settings.fontSize === 1.15 ? 'Large' : 'Extra Large'}
+                </span>
+              </div>
+              <div
+                className="grid grid-cols-4 gap-1 rounded-xl bg-gray-900/90 p-1 border border-white/10"
+                role="radiogroup"
+                aria-label="Select text size"
+              >
+                {[
+                  { label: 'Small', value: 0.85 },
+                  { label: 'Normal', value: 1.0 },
+                  { label: 'Large', value: 1.15 },
+                  { label: 'XL', value: 1.3 },
+                ].map(({ label, value }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="radio"
+                    aria-checked={settings.fontSize === value}
+                    onClick={() => {
+                      updateSettings({ fontSize: value });
+                      triggerHaptic('selection');
+                      speak(`Text size set to ${label}.`);
+                    }}
+                    className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      settings.fontSize === value
+                        ? 'bg-cyan-500 text-gray-950 shadow-md'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <hr className="border-white/10" />
+
             {/* Language Preference */}
             <div className="space-y-1.5">
               <label htmlFor="language-select" className="text-sm font-bold text-white flex items-center gap-2">

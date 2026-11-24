@@ -45,9 +45,7 @@ export default function Home() {
     // Load recent scans
     const history = historyService.getHistory();
     setRecentScans(history.slice(0, 3));
-    if (settings.accessibilityMode === 'voice') {
-      speak('Drishti AI Home. Tap Scan Currency Note to scan with camera, or tap Push to Talk to speak a command.');
-    }
+    speak('Welcome to Drishti AI. Your currency recognition assistant is ready. Tap Scan Currency to begin scanning banknotes.');
   }, []);
 
   const handleStartDemoScan = (denom: Denomination) => {

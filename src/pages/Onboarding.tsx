@@ -52,6 +52,11 @@ export default function Onboarding() {
   const step = steps[currentStep];
   const isLast = currentStep === steps.length - 1;
 
+  // One-time welcome announcement on first render (step 0 only)
+  useEffect(() => {
+    speak('Welcome to Drishti AI. Your currency recognition assistant is ready.');
+  }, []);
+
   useEffect(() => {
     // Announce current step for screen readers / voice users
     const textToSpeak = `${step.title}. ${step.subtitle}. ${step.description}`;

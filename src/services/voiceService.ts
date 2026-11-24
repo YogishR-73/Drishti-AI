@@ -179,13 +179,22 @@ class VoiceService {
 
   announceDenomination(denomination: string, confidence?: number): void {
     const clean = denomination.replace('₹', '').trim();
-    let text = `Detected currency: ${clean} Rupees.`;
+
+    // Human-readable denomination words
+    const WORDS: Record<string, string> = {
+      '10': 'ten', '20': 'twenty', '50': 'fifty',
+      '100': 'one hundred', '200': 'two hundred', '500': 'five hundred',
+    };
+    const word = WORDS[clean] || clean;
+
+    // Spec-required announcement format
+    let text = `This is an Indian ${word} rupee note.`;
     if (this.currentLanguage.startsWith('hi')) {
-      text = `पहचाना गया नोट: ${clean} रुपये।`;
+      text = `यह भारतीय ${clean} रुपये का नोट है।`;
     }
-    if (confidence) {
+    if (confidence !== undefined && confidence > 0) {
       const pct = Math.round(confidence * 100);
-      text += ` ${pct}% confidence.`;
+      text += ` Confidence: ${pct} percent.`;
     }
     this.triggerHaptic('success');
     this.speak(text);

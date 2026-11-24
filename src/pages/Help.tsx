@@ -130,6 +130,31 @@ export default function Help() {
   return (
     <Layout title="Help & Instructions" showBack>
       <div className="space-y-6">
+        {/* TalkBack Setup Guide */}
+        <section
+          aria-label="TalkBack Setup Guide"
+          className="rounded-2xl bg-[#0c2452] border border-teal-500/20 p-5 space-y-3"
+        >
+          <div className="flex items-center gap-2 text-teal-300">
+            <Smartphone className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
+            <h2 className="font-extrabold text-lg text-white">TalkBack Setup Guide</h2>
+          </div>
+          <ul className="space-y-2 text-sm text-gray-300 leading-relaxed list-none">
+            <li>
+              <span className="font-bold text-teal-300">Enable TalkBack:</span> Settings → Accessibility → TalkBack → turn On
+            </li>
+            <li>
+              <span className="font-bold text-teal-300">Navigate:</span> Swipe right to move to next item, swipe left to go back
+            </li>
+            <li>
+              <span className="font-bold text-teal-300">Activate:</span> Double-tap to activate focused item
+            </li>
+            <li>
+              <span className="font-bold text-teal-300">Add to home screen:</span> Open app in browser → Menu → Add to Home Screen
+            </li>
+          </ul>
+        </section>
+
         {/* Intro Banner */}
         <section
           aria-label="Help Introduction"

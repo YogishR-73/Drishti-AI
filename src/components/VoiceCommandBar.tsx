@@ -26,6 +26,7 @@ export const VoiceCommandBar: React.FC<VoiceCommandBarProps> = ({ onCaptureReque
 
   const [showCommandSheet, setShowCommandSheet] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const isScanScreen = location.pathname === '/scan';
   const isResultScreen = location.pathname === '/result';
@@ -83,12 +84,14 @@ export const VoiceCommandBar: React.FC<VoiceCommandBarProps> = ({ onCaptureReque
     setStatusMessage('Listening for command...');
     const result = await listenForCommand();
 
+    setIsProcessing(true);
     if (result) {
       setStatusMessage(`Heard: "${result.transcript}"`);
       executeAction(result.action);
     } else {
       setStatusMessage('No command heard.');
     }
+    setIsProcessing(false);
   };
 
   return (
@@ -104,9 +107,11 @@ export const VoiceCommandBar: React.FC<VoiceCommandBarProps> = ({ onCaptureReque
             type="button"
             onClick={handleMicClick}
             aria-label={
-              isListening
-                ? 'Listening for voice command. Tap to stop.'
-                : 'Push to talk voice command. Tap and say Scan, Capture, Repeat, or Help.'
+              isProcessing
+                ? 'Processing your voice command.'
+                : isListening
+                ? 'Listening for your voice command. Speak now.'
+                : 'Push to talk. Say a command like Scan Currency, Capture, or Help'
             }
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold min-h-[52px] transition-all ${
               isListening

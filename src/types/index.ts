@@ -52,6 +52,8 @@ export interface AppSettings {
   highContrast: boolean;
   largeText: boolean;
   hapticFeedback: boolean;
+  /** Font/text size scale: 0.85 = Small, 1.0 = Normal, 1.15 = Large, 1.3 = Extra Large */
+  fontSize: number;
 }
 
 /** Default application settings */
@@ -63,6 +65,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   highContrast: false,
   largeText: false,
   hapticFeedback: true,
+  fontSize: 1.0,
 };
 
 /** A history record extends the recognition result */

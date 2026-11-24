@@ -11,6 +11,7 @@ const defaultSettings: AppSettings = {
   highContrast: false,
   largeText: false,
   hapticFeedback: true,
+  fontSize: 1.0,
 };
 
 interface SettingsContextValue {
