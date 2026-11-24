@@ -29,33 +29,53 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # 4. Setup Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # 4. Use pre-installed Android SDK (no setup action needed)
+      - name: Set Android SDK environment
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
+          echo "$ANDROID_SDK_ROOT/build-tools/35.0.0" >> $GITHUB_PATH
 
-      # 5. Install frontend dependencies
+      # 5. Accept Android SDK licenses
+      - name: Accept Android SDK licenses
+        run: |
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      # 6. Install required Android SDK components
+      - name: Install Android SDK components
+        run: |
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
+
+      # 7. Install frontend dependencies
       - name: Install npm dependencies
         run: npm ci
 
-      # 6. Build React frontend (Vite)
+      # 8. Build React frontend (Vite)
       - name: Build React frontend
         run: npm run build
 
-      # 7. Install Capacitor CLI and sync Android
+      # 9. Install Capacitor CLI and sync Android
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      # 8. Make gradlew executable
+      # 10. Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      # 9. Build the debug APK
+      # 11. Build the debug APK
       - name: Build Debug APK
         run: |
           cd android
           ./gradlew assembleDebug --no-daemon
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      # 10. Upload APK as downloadable artifact
+      # 12. Upload APK as downloadable artifact
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -63,7 +83,7 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      # 11. Show APK info
+      # 13. Show APK info
       - name: Show APK size
         run: |
           echo "✅ APK BUILD SUCCESSFUL!"
